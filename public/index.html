@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="icon" href="<%= BASE_URL %>favicon.png" />
+    <script type="text/javascript">
+      var hostname = location.hostname
+      var dot = hostname.indexOf('.')
+      var alias = dot !== -1 ? hostname.substring(0, dot) : ''
+      var link = document.createElement('link')
+      link.type = 'image/x-icon'
+      link.rel = 'shortcut icon'
+      link.href = '<%= VUE_APP_OSS_BASE_URL %>' + '/event/alias/icon/' + alias + '.ico'
+      document.getElementsByTagName('head')[0].appendChild(link)
+      document.write('<script src="<%= BASE_URL %>sdk/NIM_Web_SDK_v8.11.2.js"><\/script>')
+      window.console.success = function (str) {
+        console.log('%c ' + str, 'color:green')
+      }
+    </script>
+    <title>有了 Gotin</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please
+        enable it to continue.
+      </strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

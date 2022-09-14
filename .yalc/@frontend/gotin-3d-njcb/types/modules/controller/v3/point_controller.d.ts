@@ -1,0 +1,32 @@
+import { AvatarInterface } from '../../../modules/avatar/v2/avatar_interface';
+import * as BABYLON from '@babylonjs/core';
+import { AnimationStateMachine } from './animation_state_machine';
+import { ControllerAttribute } from './controllerAttribute';
+export declare class PointController {
+    isEnabledCameraRotation: boolean;
+    private _scene;
+    private _player;
+    private _targetPoint;
+    private _tempQuat;
+    private _locateBox;
+    private _tempRotation;
+    private _speed;
+    private _pointerMesh;
+    private _pointerMeshTime;
+    private _animationFuc?;
+    private _controllerAttribute;
+    private _targetDistance;
+    private _leftMouseDown;
+    private _leftMouseMove;
+    private _pointerDownTime;
+    private _rayCheckTime;
+    private _lastFrameTime;
+    private _pointerObservable?;
+    constructor(scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera, player: AvatarInterface, locateBox: BABYLON.Mesh, animationStateMachine?: AnimationStateMachine, config?: Partial<ControllerAttribute>);
+    attachPlayer(): void;
+    detachPlayer(): void;
+    private _clickHandler;
+    private _checkIfCollision;
+    _clearTarget(): void;
+    update: () => void;
+}

@@ -1,0 +1,18 @@
+nginx:
+  sagaurl: http://saga.gsmatest:8081
+  ossuploadurl: http://ossupload.gsmatest:8084
+  apiserverurl: http://api-server.gsmatest:3030
+  datalayerurl: http://gotin-data-layer.gsmatest:50000
+  essearchurl: http://essearch.gsmatest:80
+
+jxRequirements:
+  ingress:
+    namespaceSubDomain: ".pr{{ requiredEnv "PULL_NUMBER" }}."
+image:
+  repository: "{{ requiredEnv "DOCKER_REGISTRY" }}/{{ requiredEnv "DOCKER_REGISTRY_ORG" }}/{{ requiredEnv "APP_NAME" }}"
+  tag: "{{ requiredEnv "VERSION" }}"
+  pullPolicy: "Always"
+  tagSuffix: test
+
+redirectEnabled: false
+

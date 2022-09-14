@@ -1,0 +1,30 @@
+import * as BABYLON from '@babylonjs/core';
+import { CONTROLLER_TYPE_ENUM } from './controller_type_enum';
+import { ControllerAttribute, CameraState } from './controllerAttribute';
+import { AvatarInterface } from '../../../modules/avatar/v2/avatar_interface';
+import { ControllerOption } from './controller_option';
+export declare class CameraController {
+    private _scene;
+    private _camera;
+    private _player;
+    private _time;
+    private _cameraState?;
+    private _cameraProperty?;
+    private _controllerType?;
+    private _controllerAttribute;
+    private _adleRunTime;
+    private _cameraAdleDelayTime;
+    private _cameraY;
+    private _cameraRay;
+    constructor(scene: BABYLON.Scene, camera: BABYLON.ArcRotateCamera, player: AvatarInterface, config?: Partial<ControllerAttribute>);
+    attachControl(option?: ControllerOption): void;
+    detachControl(): void;
+    thirdPersonCamera(controllerType: CONTROLLER_TYPE_ENUM): void;
+    firstPersonCamera(): void;
+    private delayCamera;
+    update: () => void;
+    getCameraState(camera: BABYLON.ArcRotateCamera): CameraState;
+    setCameraState(state: CameraState): void;
+    moveCameraFreeStyle(camera: BABYLON.ArcRotateCamera, startAlpha: number, startBeta: number): void;
+    checkHouseObstacleAndProcess(): void;
+}

@@ -1,0 +1,21 @@
+fullnameOverride: "gotin-mobile-nanjing"
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  cpuTargetAverageUtilization: 80
+  memoryTargetAverageUtilization: 80
+jxRequirements:
+  ingress:
+    domain: "gotin.online"
+    namespaceSubDomain: .
+    domainPrefix: "njcb"
+    tls:
+      enabled: true
+      secretName: "gotin-online"
+
+swa:
+  enabled: false
+image:
+  tagSuffix: prod

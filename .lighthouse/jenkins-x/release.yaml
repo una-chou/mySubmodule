@@ -1,0 +1,44 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      taskSpec:
+        metadata:
+          labels:
+            alibabacloud.com/eci: "true"
+          annotations:
+             k8s.aliyun.com/eci-use-specs: 8-16Gi,8-8Gi
+        stepTemplate:
+          image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/javascript-ui-nginx/release.yaml@versionStream
+          name: ""
+        steps:
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+        - name: next-version
+        - name: jx-variables
+        - name: build-npm-install
+        - name: check-registry
+        # - name: build-ui-build:stag
+        #   env: 
+        #   - name: NPM_BUILD_ACTION
+        #     value: build:staging
+        # - name: build-container-build:stag
+        #   env:
+        #   - name: IMAGE_TAG_SUFFIX
+        #     value: stag
+        - name: build-ui-build:prod
+          env: 
+          - name: NPM_BUILD_ACTION
+            value: buildprod
+        - name: build-container-build:prod
+          env:
+          - name: IMAGE_TAG_SUFFIX
+            value: prod
+        - name: promote-changelog
+        - name: promote-helm-release
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/updatebot/release-argo-staging-production.yaml@versionStream
+  serviceAccountName: tekton-bot
+  timeout: 1h0m0s

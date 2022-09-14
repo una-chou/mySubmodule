@@ -1,0 +1,34 @@
+{
+    "name": "@frontend/gotin-3d-njcb",
+    "version": "1.0.11",
+    "description": "Based on BabylonJS package 3D framework for rapid development of 3D interactive applications",
+    "types": "types/index.d.ts",
+    "module": "index.es.js",
+    "main": "index.es.js",
+    "scripts": {
+        "build:lib": "vite build --mode lib",
+        "build": "gulp --require @esbuild-kit/cjs-loader -f ./build/gulpfiles.ts",
+        "build:spa": "vite build --mode spa",
+        "clean:dist": "rimraf dist",
+        "dev": "vite --host",
+        "prettier": "npx prettier --write  ./src",
+        "tsc": "tsc --skipLibCheck --noEmit --project ./tsconfig.json",
+        "server": "npx tsc src/server/server.ts && node src/server/server.js",
+        "server_v2": "npx tsc src/server/v2/server.ts && node src/server/v2/server.js",
+        "gltf_encrypt": "npx tsc ./src/tools/gltf_process/gltf_process.ts && node ./src/tools/gltf_process/gltf_process.js",
+        "glb_encrypt": "npx tsc ./src/tools/gltf_process/glb_process.ts && node ./src/tools/gltf_process/glb_process.js"
+    },
+    "files": [
+        "**/*.js",
+        "**/*.d.ts"
+    ],
+    "author": "",
+    "license": "",
+    "engines": {
+        "node": ">=14.13.1"
+    },
+    "dependencies": {
+        
+    },
+    "yalcSig": "9670977a543e1acdfee236aa3f854400"
+}

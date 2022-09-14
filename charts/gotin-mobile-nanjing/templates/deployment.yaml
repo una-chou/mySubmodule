@@ -1,0 +1,97 @@
+{{- if .Values.canary.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+{{- else }}
+apiVersion: apps/v1
+kind: Deployment
+{{- end }}
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  annotations:
+{{ toYaml .Values.canary.annotations | indent 4 }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+{{- if .Values.hpa.enabled }}
+{{- else }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  {{- if .Values.canary.enabled }}
+  strategy:
+    canary:
+      canaryService: {{ .Values.service.name }}-preview
+      stableService: {{ .Values.service.name }}
+      trafficRouting:
+        nginx:
+          stableIngress: {{ .Values.service.name }}
+          additionalIngressAnnotations:
+            canary-by-cookie: X-Canary
+      steps:
+{{ toYaml .Values.canary.steps | indent 8 }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+{{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
+    spec:
+{{- if .Values.serviceAccount.enabled }}
+{{- if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- else }}
+      serviceAccountName: {{ template "fullname" . }}
+{{- end }}
+{{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}-{{ .Values.image.tagSuffix }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: VERSION
+          value: {{ .Chart.Version }}
+{{- range $pkey, $pval := .Values.env }}
+        - name: {{ $pkey }}
+          value: {{ quote $pval }}
+{{- end }}
+        envFrom:
+{{ toYaml .Values.envFrom | indent 10 }}
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-conf
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessProbe.probePath | default .Values.probePath }}
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessProbe.probePath | default .Values.probePath }}
+            port: {{ .Values.service.internalPort }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      imagePullSecrets:
+{{- range $pval := .Values.jx.imagePullSecrets }}
+      - name: {{ quote $pval }}
+{{- end }}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: cm-{{ template "fullname" . }}
+        name: nginx-conf

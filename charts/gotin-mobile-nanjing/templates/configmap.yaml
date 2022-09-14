@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-{{ template "fullname" . }}
+  labels:
+    draft: {{ default "draft-app" .Values.draft }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+data:
+  default.conf: |
+    server {
+        listen       80;
+        {{- if .Values.redirectEnabled }}
+        server_name ~^(?<alias>[a-z0-9]+)\.(?<basedomain>.+);
+        set $agentflag 0;
+        set $skipRedirect 0;
+        if ($http_user_agent ~* "(Mobile)" ){
+            set $agentflag 1;
+        }
+        if ($request_uri ~* "^/personal/"){
+            set $skipRedirect 1;
+        }
+        set $redirect "${agentflag}${skipRedirect}";
+        if ( "$redirect" = "10" ) {
+            return 301 https://$alias.m.$basedomain$request_uri;
+        }
+        {{- else }}
+        server_name  localhost;
+        {{- end }}
+
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        client_max_body_size 800M;
+        proxy_send_timeout 3000;
+        proxy_read_timeout 3000;
+
+        location / {
+            try_files   $uri    $uri/   /index.html;
+            add_header Cache-Control max-age=10,s-maxage=10;
+        }
+        location ^~ /game_njcb/ {
+            add_header Cache-Control no-cache;
+        }
+        location ~ \.(js|css|jpg|png|jpeg|gif|svg|ico|ttf)$ {
+            add_header Cache-Control max-age=5194000,s-maxage=5194000;
+        }
+
+        error_page  404              /404.html;
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }

@@ -1,0 +1,22 @@
+export declare const ConfigNpc: {
+    id: string;
+    resource_path: string;
+    resource_name: string;
+    x: number;
+    y: number;
+    z: number;
+    orientation: number;
+    type: number;
+    npc_name: string;
+    bubble: string;
+    npc_bubble1: string;
+    npc_bubble2: string;
+    ai: number;
+    type_hot: number;
+    range_hot: string;
+    if_interactive: boolean;
+    interactive_type: number;
+    dialogue_id: number;
+    skip_to: string;
+    path_data: number[][];
+}[];

@@ -1,0 +1,53 @@
+{{- if  .Values.swa.enabled }}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: {{ template "fullname" . }}-swa-{{ .Chart.Version | replace "+" "_" | lower }}
+  labels:
+    draft: {{ default "draft-app" .Values.draft }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  {{- if .Values.swa.annotations }}
+  annotations:
+{{ toYaml .Values.swa.annotations | indent 4 }}
+  {{- end }}
+spec:
+  template:
+    metadata:
+      labels:
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_"  | lower }}"
+        app: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" | lower }}-swa-sync"
+    spec:
+      restartPolicy: Never
+      {{- if .Values.serviceAccount.enabled }}
+      {{- if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "fullname" . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}-swa:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: VERSION
+          value: {{ .Chart.Version }}
+        - name: SWA_CLI_DEPLOYMENT_TOKEN
+          valueFrom:
+            secretKeyRef:
+                name: swa-tokens
+                key: {{ .Chart.Name }}
+        command:
+        - "swa"
+        args:
+        - deploy
+        - .
+        - --env
+        - production 
+      imagePullSecrets:
+      {{- range $pval := .Values.jx.imagePullSecrets }}
+      - name: {{ quote $pval }}
+      {{- end }}
+{{- end }}

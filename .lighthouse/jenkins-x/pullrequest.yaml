@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      taskSpec:
+        metadata:
+          labels:
+            alibabacloud.com/eci: true
+          annotations:
+             k8s.aliyun.com/eci-use-specs: 8-4Gi,8-8Gi
+        stepTemplate:
+          image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/javascript-ui-nginx/pullrequest.yaml@versionStream
+          name: ""
+          workingDir: /workspace/source
+        steps:
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/conventionalcommits/pr.yaml@versionStream
+          name: ""
+        - name: jx-variables
+        - name: build-npm-install
+        - name: build-ui-build
+          env:
+          - name: NPM_BUILD_ACTION
+            value: build:jx-test
+        - name: check-registry
+        - name: build-container-build:test
+          env:
+          - name: IMAGE_TAG_SUFFIX
+            value: test
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/helm-release/helm-release-pr.yaml@versionStream
+        - image: uses:lighthouse:ops/jx3-pipeline-catalog/tasks/updatebot/release-argo-test.yaml@versionStream
+        - name: promote-jx-preview
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 1h0m0s
+status: {}

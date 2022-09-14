@@ -1,0 +1,34 @@
+import { AssetInterface } from '../../../modules/asset/v1/asset_interface';
+import { CharacterInterface } from '@/modules/avatar/v1/character_interface';
+import * as BABYLON from '@babylonjs/core';
+import * as BABYLONGUI from '@babylonjs/gui';
+export declare class Minimap {
+    private _scene;
+    private _camera;
+    private _player;
+    private _ui;
+    private _navigation;
+    private _navigationPlayerLabel;
+    private _navigationTop;
+    private _navigationLeft;
+    private _navigationRotationFlag;
+    private _areaPlayerLabel;
+    private _circleList;
+    private _state;
+    private _topCameraRadius;
+    private _topCameraAlpha;
+    private _topCameraBeta;
+    private _bottomCameraRadius;
+    private _bottomCameraAlpha;
+    private _bottomCameraBeta;
+    constructor(scene: BABYLON.Scene, ui: BABYLONGUI.AdvancedDynamicTexture, groundAssetList: BABYLON.AssetContainer[], player: CharacterInterface, camera: BABYLON.ArcRotateCamera, labelAsset: AssetInterface);
+    update(): void;
+    resize(): void;
+    private _clickAreaHandler;
+    private _toTopView;
+    private _toBottomView;
+    private _createArea;
+    private _createAreaPlayerLabel;
+    private _createNavigation;
+    private _createNavigationPlayerLabel;
+}

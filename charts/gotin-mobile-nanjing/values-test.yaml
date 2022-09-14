@@ -1,0 +1,19 @@
+fullnameOverride: "gotin-mobile-nanjing"
+
+nginx:
+  sagaurl: http://saga.gsmatest:8081
+
+ingress:
+  annotations: 
+    cert-manager.io/cluster-issuer: letsencrypt
+jxRequirements:
+  ingress:
+    domain: "gotin.top"
+    externalDNS: false
+    namespaceSubDomain: .test.
+    tls:
+      enabled: true
+      secretName: "acme-test-gotin-top"
+
+image:
+  tagSuffix: test
